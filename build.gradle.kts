@@ -8,7 +8,10 @@ val kotlin_version: String by project
 plugins {
     application
     kotlin("jvm") version "1.3.41"
+    id("com.moowork.node") version "1.3.1"
 }
+
+apply(plugin = "com.moowork.node")
 
 group = "ch.keepclam"
 version = "0.0.1-SNAPSHOT"
@@ -20,7 +23,10 @@ application {
 repositories {
     mavenLocal()
     jcenter()
-    maven { url = uri("https://kotlin.bintray.com/ktor") }
+    maven {
+        url = uri("https://kotlin.bintray.com/ktor")
+        url = uri("https://plugins.gradle.org/m2/")
+    }
 }
 
 dependencies {
@@ -30,6 +36,8 @@ dependencies {
     compile("io.ktor:ktor-server-core:$ktor_version")
     compile("io.ktor:ktor-freemarker:$ktor_version")
     compile("io.ktor:ktor-server-host-common:$ktor_version")
+    compile("com.moowork.gradle:gradle-node-plugin:1.3.1")
+    // Test
     testCompile("io.ktor:ktor-server-tests:$ktor_version")
 }
 
