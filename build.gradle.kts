@@ -1,32 +1,32 @@
-import org.jetbrains.kotlin.gradle.dsl.Coroutines
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 val logback_version: String by project
 val ktor_version: String by project
 val kotlin_version: String by project
 
+group = "ch.keepclam"
+version = "1.0.0-SNAPSHOT"
+
 plugins {
     application
     kotlin("jvm") version "1.3.41"
-    id("com.moowork.node") version "1.3.1"
+    id ("com.google.cloud.tools.jib") version "1.4.0"
 }
 
-apply(plugin = "com.moowork.node")
-
-group = "ch.keepclam"
-version = "0.0.1-SNAPSHOT"
+jib.from.image = "openjdk:8-jre-alpine"
+jib.to.image = "c3smonkey/ktor-webapp:$version"  // Used for docker hub
+jib.container.jvmFlags = listOf( "-Djava.security.egd=file:/dev/./urandom")
+jib.container.ports = listOf("8080")
+jib.container.user = "1000320000"
 
 application {
     mainClassName = "io.ktor.server.netty.EngineMain"
+    applicationName = "ktor-webapp"
+    version = "$version"
+    group = "$group"
 }
 
 repositories {
     mavenLocal()
     jcenter()
-    maven {
-        url = uri("https://kotlin.bintray.com/ktor")
-        url = uri("https://plugins.gradle.org/m2/")
-    }
 }
 
 dependencies {
@@ -36,13 +36,13 @@ dependencies {
     compile("io.ktor:ktor-server-core:$ktor_version")
     compile("io.ktor:ktor-freemarker:$ktor_version")
     compile("io.ktor:ktor-server-host-common:$ktor_version")
-    compile("com.moowork.gradle:gradle-node-plugin:1.3.1")
     // Test
     testCompile("io.ktor:ktor-server-tests:$ktor_version")
 }
 
 kotlin.sourceSets["main"].kotlin.srcDirs("src")
 kotlin.sourceSets["test"].kotlin.srcDirs("test")
+kotlin.experimental
 
 sourceSets["main"].resources.srcDirs("resources")
 sourceSets["test"].resources.srcDirs("testresources")

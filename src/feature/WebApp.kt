@@ -15,6 +15,7 @@ import io.ktor.routing.get
 import io.ktor.routing.routing
 
 fun Application.webapp() {
+
     install(FreeMarker) {
         templateLoader = ClassTemplateLoader(this::class.java.classLoader, "templates")
     }
