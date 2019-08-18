@@ -10,62 +10,9 @@ plugins {
     kotlin("jvm") version "1.3.41"
     id("com.google.cloud.tools.jib") version "1.4.0"
     id("pl.allegro.tech.build.axion-release") version "1.10.1"
-
-//    id("de.gliderpilot.semantic-release") version "1.4.0"
-//    id("org.danilopianini.git-sensitive-semantic-versioning") version "0.2.2"
-//    id("net.vivin.gradle-semantic-build-versioning") version "4.0.0"
-//    id("de.maltsev.gradle.semanticrelease") version "0.3.4"
-//    id("com.github.moleksyuk.vcs-semantic-version") version "1.1.3"
-//    id("net.thauvin.erik.gradle.semver") version "1.0.4"
-//    id("com.github.gradle-git-version-calculator") version "1.1.0"
-//    id("nebula.release") version "11.0.0"
-//    id ("fr.brouillard.oss.gradle.jgitver") version "0.9.1"
 }
 
 project.version = scmVersion.version
-
-
-//jgitver {
-//    autoIncrementPatch = true
-//    strategy = Strategies.MAVEN
-//}
-
-//nebulaRelease {
-//    Set<String> releaseBranchPatterns = [/master/, /HEAD/, /(release(-|\/))?\d+(\.\d+)?\.x/, /v?\d+\.\d+\.\d+/] as Set
-//    Set<String> excludeBranchPatterns = [] as Set
-//    String shortenedBranchPattern = /(?:(?:bugfix|feature|hotfix|release)(?:-|\/))?(.+)/
-//
-//    void addReleaseBranchPattern(String pattern)
-//    void addExcludeBranchPattern(String pattern)
-//}
-//
-
-//tasks {
-//    "incrementBuildMeta"(SemverIncrementBuildMetaTask::class) {
-//        doFirst {
-//            buildMeta = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
-//        }
-//    }
-//    "run"(JavaExec::class) {
-//        doFirst {
-//            println("Version: $version")
-//        }
-//        args = listOf("version.properties")
-//        version = gitVersionCalculator.calculateVersion("prefix", true)
-//        println("Version............: $version")
-//        println( "Build: $semver.buildMeta")
-//    }
-//}
-
-//task(name = "fooTask"){
-//    println( "Build: $semver.buildMeta")
-//}
-
-//task(name ="fooBar"){
-//    println(gitVersionCalculator.calculateVersion("prefix", true))
-//    println(version)
-//}
-
 
 application {
     mainClassName = "io.ktor.server.netty.EngineMain"
