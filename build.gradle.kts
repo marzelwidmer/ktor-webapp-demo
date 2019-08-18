@@ -1,4 +1,3 @@
-import fr.brouillard.oss.jgitver.Strategies
 
 val logback_version: String by project
 val ktor_version: String by project
@@ -18,13 +17,13 @@ plugins {
 //    id("net.thauvin.erik.gradle.semver") version "1.0.4"
 //    id("com.github.gradle-git-version-calculator") version "1.1.0"
 //    id("nebula.release") version "11.0.0"
-    id ("fr.brouillard.oss.gradle.jgitver") version "0.9.1"
+//    id ("fr.brouillard.oss.gradle.jgitver") version "0.9.1"
 }
 
-jgitver {
-    autoIncrementPatch = true
-    strategy = Strategies.MAVEN
-}
+//jgitver {
+//    autoIncrementPatch = true
+//    strategy = Strategies.MAVEN
+//}
 
 //nebulaRelease {
 //    Set<String> releaseBranchPatterns = [/master/, /HEAD/, /(release(-|\/))?\d+(\.\d+)?\.x/, /v?\d+\.\d+\.\d+/] as Set
