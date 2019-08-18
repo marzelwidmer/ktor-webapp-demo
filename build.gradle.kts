@@ -1,3 +1,4 @@
+import java.util.regex.Pattern
 
 val logback_version: String by project
 val ktor_version: String by project
@@ -13,6 +14,20 @@ plugins {
 }
 
 project.version = scmVersion.version
+
+scmVersion {
+     releaseBranchPattern =  Pattern.compile("(/.*)?$")
+
+//    tag {
+//        prefix = "my-project-name"
+//    }
+//    versionCreator "versionWithBranch"
+//
+//    hooks {
+//        pre "fileUpdate", [file: 'README.md', pattern: {v,p -> /(version.) $v/}, replacement: {v, p -> "\$1 $v"}]
+//        pre "commit"
+//    }
+}
 
 application {
     mainClassName = "io.ktor.server.netty.EngineMain"
