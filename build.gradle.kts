@@ -1,6 +1,4 @@
-import net.thauvin.erik.gradle.semver.SemverIncrementBuildMetaTask
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import fr.brouillard.oss.jgitver.Strategies
 
 val logback_version: String by project
 val ktor_version: String by project
@@ -17,39 +15,53 @@ plugins {
 //    id("net.vivin.gradle-semantic-build-versioning") version "4.0.0"
 //    id("de.maltsev.gradle.semanticrelease") version "0.3.4"
 //    id("com.github.moleksyuk.vcs-semantic-version") version "1.1.3"
-    id("net.thauvin.erik.gradle.semver") version "1.0.4"
-    id("com.github.gradle-git-version-calculator") version "1.1.0"
-//    id("com.github.ben-manes.versions").version("0.21.0")
+//    id("net.thauvin.erik.gradle.semver") version "1.0.4"
+//    id("com.github.gradle-git-version-calculator") version "1.1.0"
+//    id("nebula.release") version "11.0.0"
+    id ("fr.brouillard.oss.gradle.jgitver") version "0.9.1"
 }
 
-
-tasks {
-    withType<Test> {
-        useTestNG()
-    }
-    "incrementBuildMeta"(SemverIncrementBuildMetaTask::class) {
-        doFirst {
-            buildMeta = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
-        }
-    }
-    "run"(JavaExec::class) {
-        doFirst {
-            println("Version: $version")
-        }
-        args = listOf("version.properties")
-    }
+jgitver {
+    autoIncrementPatch = true
+    strategy = Strategies.MAVEN
 }
 
-task(name = "fooTask"){
-    println( "Build: $semver.buildMeta")
-}
+//nebulaRelease {
+//    Set<String> releaseBranchPatterns = [/master/, /HEAD/, /(release(-|\/))?\d+(\.\d+)?\.x/, /v?\d+\.\d+\.\d+/] as Set
+//    Set<String> excludeBranchPatterns = [] as Set
+//    String shortenedBranchPattern = /(?:(?:bugfix|feature|hotfix|release)(?:-|\/))?(.+)/
+//
+//    void addReleaseBranchPattern(String pattern)
+//    void addExcludeBranchPattern(String pattern)
+//}
+//
 
+//tasks {
+//    "incrementBuildMeta"(SemverIncrementBuildMetaTask::class) {
+//        doFirst {
+//            buildMeta = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+//        }
+//    }
+//    "run"(JavaExec::class) {
+//        doFirst {
+//            println("Version: $version")
+//        }
+//        args = listOf("version.properties")
+//        version = gitVersionCalculator.calculateVersion("prefix", true)
+//        println("Version............: $version")
+//        println( "Build: $semver.buildMeta")
+//    }
+//}
 
-task(name ="fooBar"){
-    println("Hello.... $version")
+//task(name = "fooTask"){
+//    println( "Build: $semver.buildMeta")
+//}
 
-    println(gitVersionCalculator.calculateVersion("prefix", true))
-}
+//task(name ="fooBar"){
+//    println(gitVersionCalculator.calculateVersion("prefix", true))
+//    println(version)
+//}
+
 
 application {
     mainClassName = "io.ktor.server.netty.EngineMain"
