@@ -6,3 +6,4 @@
 *.ipr
 *.iws
 /package-lock.json
+/version.properties
