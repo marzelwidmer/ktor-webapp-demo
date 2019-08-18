@@ -9,6 +9,8 @@ plugins {
     application
     kotlin("jvm") version "1.3.41"
     id("com.google.cloud.tools.jib") version "1.4.0"
+    id("pl.allegro.tech.build.axion-release") version "1.10.1"
+
 //    id("de.gliderpilot.semantic-release") version "1.4.0"
 //    id("org.danilopianini.git-sensitive-semantic-versioning") version "0.2.2"
 //    id("net.vivin.gradle-semantic-build-versioning") version "4.0.0"
@@ -19,6 +21,9 @@ plugins {
 //    id("nebula.release") version "11.0.0"
 //    id ("fr.brouillard.oss.gradle.jgitver") version "0.9.1"
 }
+
+project.version = scmVersion.version
+
 
 //jgitver {
 //    autoIncrementPatch = true
