@@ -3,19 +3,13 @@ val ktor_version: String by project
 val kotlin_version: String by project
 
 group = "ch.keepclam"
-version = "1.0.0-SNAPSHOT"
 
 plugins {
     application
     kotlin("jvm") version "1.3.41"
     id ("com.google.cloud.tools.jib") version "1.4.0"
+    id("de.gliderpilot.semantic-release") version "1.4.0"
 }
-
-jib.from.image = "openjdk:8-jre-alpine"
-jib.to.image = "c3smonkey/ktor-webapp:$version"  // Used for docker hub
-jib.container.jvmFlags = listOf( "-Djava.security.egd=file:/dev/./urandom")
-jib.container.ports = listOf("8080")
-jib.container.user = "1000320000"
 
 application {
     mainClassName = "io.ktor.server.netty.EngineMain"
@@ -38,6 +32,7 @@ dependencies {
     compile("io.ktor:ktor-server-host-common:$ktor_version")
     // Test
     testCompile("io.ktor:ktor-server-tests:$ktor_version")
+
 }
 
 kotlin.sourceSets["main"].kotlin.srcDirs("src")
@@ -46,3 +41,10 @@ kotlin.experimental
 
 sourceSets["main"].resources.srcDirs("resources")
 sourceSets["test"].resources.srcDirs("testresources")
+
+// Jib Plugun
+jib.from.image = "openjdk:8-jre-alpine"
+jib.to.image = "c3smonkey/ktor-webapp:$version"  // Used for docker hub
+jib.container.jvmFlags = listOf( "-Djava.security.egd=file:/dev/./urandom")
+jib.container.ports = listOf("8080")
+jib.container.user = "1000320000"
