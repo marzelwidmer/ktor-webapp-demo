@@ -1,33 +1,139 @@
+defaults:
+  working_directory: ~/repo
+  docker:
+    - image: circleci/openjdk:8-jdk-browsers
+node-defaults:
+  docker:
+    - image: circleci/node:10
+docker-defaults:
+  docker:
+    - image: docker:17.05.0-ce-git
 version: 2
 jobs:
-  test_node_6:
+  checkout_code:
+    working_directory: ~/repo
     docker:
-      - image: circleci/node:6
-    steps:
-    # Configure your test steps here (checkout, npm install, cache management, tests etc...)
-
-  test_node_8:
-    docker:
-      - image: circleci/node:8
-    steps:
-    # Configure your test steps here (checkout, npm install, cache management, tests etc...)
-
-  release:
-    docker:
-      - image: circleci/node:8
+      - image: circleci/openjdk:8-jdk-browsers
     steps:
       - checkout
-      - run: npm install
-      # Run optional required steps before releasing
-      # - run: npm run build-script
-      - run: npx semantic-release
-
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - .
+  build-node:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Setup Dependencies
+          command: npm install
+      - run:
+          name: Setup Code Climate test-reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: Run Build
+          command: CI=false yarn build
+      - run:
+          name: Copy deployment artifacts to workspace
+          command: |
+            cp -R build ~/repo/build
+      - store_artifacts:
+          path: ~/repo/build
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - build/
+  release:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/openjdk:8-jdk-browsers
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - checkout
+      - run: "npx semantic-release --debug\n \n"
+  docker-build-push:
+    docker:
+      - image: docker:17.05.0-ce-git
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/repo
+      - setup_remote_docker
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --no-cache \
+              py-pip=9.0.0-r1
+            pip install \
+              docker-compose==1.12.0 \
+              awscli==1.11.76
+      - restore_cache:
+          keys:
+            - v1-{{ .Branch }}
+          paths:
+            - /caches/app.tar
+      - run:
+          name: Load Docker image layer cache
+          command: |
+            set +o pipefail
+            docker load -i /caches/app.tar | true
+      - run:
+          name: Build application Docker image
+          command: |
+            docker build --cache-from=app -t app .
+      - run:
+          name: Save Docker image layer cache
+          command: |
+            mkdir -p /caches
+            docker save -o /caches/app.tar app
+      - save_cache:
+          key: v1-{{ .Branch }}-{{ epoch }}
+          paths:
+            - /caches/app.tar
+      - deploy:
+          name: Build and Push Docker Image
+          command: |
+            TAG=${CIRCLE_SHA1}
+             if [ "${CIRCLE_BRANCH}" == "master" ]; then
+               TAG=latest
+             else
+               TAG=${CIRCLE_BRANCH}
+             fi
+             docker build -t $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:$TAG .
+             docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+             docker push $CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME:$TAG
+  okd:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/openjdk:8-jdk-browsers
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - checkout
+      - run: "\n\nENV OS_CLI_VERSION v1.1.3\nENV OS_TAG cffae05\n\napk-install curl\
+        \ ca-certificates && \\\ncurl -s -L https://github.com/openshift/origin/releases/download/${OS_CLI_VERSION}/openshift-origin-client-tools-${OS_CLI_VERSION}-${OS_TAG}-linux-64bit.tar.gz\
+        \ -o /tmp/oc.tar.gz && \\\ntar zxvf /tmp/oc.tar.gz -C /tmp/ && \\ \nmv /tmp/openshift-origin-client-tools-${OS_CLI_VERSION}-${OS_TAG}-linux-64bit/oc\
+        \ /usr/bin/ && \\\nrm -rf /tmp/oc.tar.gz /tmp/openshift-origin-client-tools-${OS_CLI_VERSION}-${OS_TAG}-linux-64bit/\
+        \ && \\\nrm -rf /root/.cache /var/cache/apk/ && \\\noc version\n\noc login\
+        \ OKD_URL --token=$OKD_TOKEN\n"
 workflows:
   version: 2
-  test_and_release:
-    # Run the test jobs first, then the release only when all the test jobs are successful
+  build-and-release:
     jobs:
-      - test_node_6
-       - release:
+      - checkout_code
+      - build-node:
           requires:
-            - test_node_6
+            - checkout_code
+      - docker-build-push:
+          requires:
+            - build-node
