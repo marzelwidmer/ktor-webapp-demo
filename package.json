@@ -4,6 +4,10 @@
   "private": true,
   "dependencies": {
   },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "semantic-release": "semantic-release"
+  },
   "devDependencies": {
     "@semantic-release/commit-analyzer": "^6.1.0",
     "@semantic-release/npm": "^5.1.4",
@@ -11,4 +15,5 @@
     "semantic-release": "^15.13.21"
   }
 }
+
 
