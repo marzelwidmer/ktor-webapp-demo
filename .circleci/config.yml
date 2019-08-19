@@ -28,8 +28,6 @@ workflows:
     # Run the test jobs first, then the release only when all the test jobs are successful
     jobs:
       - test_node_6
-      - test_node_8
-      - release:
+       - release:
           requires:
             - test_node_6
-            - test_node_8
