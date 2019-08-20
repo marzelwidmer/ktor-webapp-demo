@@ -4,7 +4,7 @@ pipeline {
     stage('Build') {
       agent {
         docker {
-          image 'gradle/jdk8'
+          image 'gradle'
         }
 
       }
