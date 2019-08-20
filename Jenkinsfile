@@ -1,12 +1,14 @@
 pipeline {
   agent any
-  environment {
-      JAVA_OPTION = '-Djsse.enableSNIExtension=false'
-  }
   stages {
     stage('Build') {
+      agent {
+        docker {
+          image 'gradle:jdk10'
+        }
+      }
       steps {
-        sh ' ./gradlew build'
+        sh ' gradlew build'
       }
     }
   }
